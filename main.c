@@ -5,9 +5,9 @@
 
 
 int main(){
-    printf("%ld\n", sizeof(int ));
+
     BMP img = open_img("./Cw_2.bmp");
-    save_img("./Cw_2(2).bmp", img);
+    save_img("./nem_img.bmp", img);
     int choice = 0;
     while (choice != 0) {
         switch (choice) {

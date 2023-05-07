@@ -38,7 +38,7 @@ BMP open_img (const char* path){
         img.data[i] = (RGB*)malloc(sizeof(RGB*)*img.info.width);
     }
     fclose(f);
-    if (img.file_header.type[0] != 'B' || img.file_header.type[1] != 'M') {
+    if (img.file_header.type[0] != 19778 && img.file_header.type[0] != 9805) {
         printf("Invalid BMP file\n");
 
     }
