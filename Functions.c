@@ -50,3 +50,15 @@ BMP open_img (const char* path){
 
     return img;
 }
+
+
+void color_inversion(BMP *img, int coord_x1, int coord_y1, int coord_x2, int coord_y2){
+    for (int i = coord_y1; i < coord_y2; i++){
+        for (int j = coord_x1; j< coord_x2; j++){
+            img->data[i][j].red = 255 - img->data[i][j].red;
+            img->data[i][j].green = 255 - img->data[i][j].green;
+            img->data[i][j].blue = 255 - img->data[i][j].blue;
+        }
+    }
+    //return img;
+}

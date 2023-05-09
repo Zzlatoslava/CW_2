@@ -10,5 +10,6 @@
 
 void save_img (const char* path, BMP img );
 BMP open_img (const char* path);
+void color_inversion(BMP *img, int coord_x1, int coord_y1, int coord_x2, int coord_y2);
 
 #endif //CW_2_FUNCTIONS_H

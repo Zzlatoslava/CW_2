@@ -7,7 +7,8 @@
 int main(){
 
     BMP img = open_img("./Cw_2.bmp");
-    save_img("./nem_img.bmp", img);
+    //color_inversion(&img, 100, 100, 750, 300);
+    save_img("./new_img.bmp", img);
     int choice = 0;
     while (choice != 0) {
         switch (choice) {
