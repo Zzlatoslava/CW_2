@@ -14,8 +14,8 @@ void save_img (const char* path, BMP img ){
     }
     fwrite(&img.file_header, 1, sizeof(img.file_header), f);
     fwrite(&img.info, 1, sizeof(img.info), f);
-    for (int i = 0; i < sizeof(img.info.width);  i++){
-        fwrite(&img.data[i], 1, sizeof(img.data)*img.info.height, f);
+    for (int i = 0; i < sizeof(img.info.height);  i++){
+        fwrite(&img.data[i], 1, sizeof(img.data)*((img.info.height*3-3)&(-4)), f);
     }
     fclose(f);
     printf("Работает!\n");
@@ -32,19 +32,21 @@ BMP open_img (const char* path){
         printf("Image is open\n");
     }
     fread(&img.file_header, 1, sizeof(img.file_header), f);
-    fread(&img.info, 1, sizeof(img.info), f);
-    img.data = (RGB**)malloc(sizeof(RGB**)*img.info.width);
+    if (img.file_header.type[0] != 19778 && img.file_header.type[0] != 9805) {
+        printf("Invalid BMP file\n");
 
-    for (int i = 0; i < sizeof(img.info.width);  i++){
-        img.data[i] = (RGB*)malloc(sizeof(RGB*)*img.info.height);
-        fread(&img.data[i], 1, sizeof(img.data)*img.info.height, f);
+
+    }
+    fread(&img.info, 1, sizeof(img.info), f);
+
+    img.data = (RGB**)malloc(sizeof(RGB*)*((img.info.height*3-3)&(-4)));
+    for (int i = 0; i < sizeof(img.info.height);  i++){
+        img.data[i] = (RGB*)malloc(sizeof(RGB)*(img.info.width));
+        fread(&img.data[i], 1, sizeof(img.data)*img.info.width, f);
     }
 
 
     fclose(f);
-    if (img.file_header.type[0] != 19778 && img.file_header.type[0] != 9805) {
-        printf("Invalid BMP file\n");
 
-    }
     return img;
 }
