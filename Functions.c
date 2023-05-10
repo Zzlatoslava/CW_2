@@ -15,7 +15,7 @@ void save_img (const char* path, BMP img ){
     fwrite(&img.file_header, 1, sizeof(img.file_header), f);
     fwrite(&img.info, 1, sizeof(img.info), f);
     for (int i = 0; i < sizeof(img.info.height);  i++){
-        fwrite(&img.data[i], 1, sizeof(img.data)*((img.info.height*3-3)&(-4)), f);
+        fwrite(&img.data[i], 1, sizeof(img.data)*((img.info.width*3-3)&(-4)), f);
     }
     fclose(f);
     printf("Работает!\n");
