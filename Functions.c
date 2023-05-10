@@ -13,7 +13,7 @@ void save_img (const char* path, BMP img ){
         fwrite(&img.file_header, 1, sizeof(img.file_header), f);
         fwrite(&img.info, 1, sizeof(img.info), f);
 
-        for (int i = 0; i < sizeof(img.info.height);  i++){
+        for (int i = 0; i < sizeof(img.data);  i++){
             fwrite(&img.data[i], 1, sizeof(img.data)*((img.info.height*3-3)&(-4)), f);
         }
         printf("Работает!\n");
@@ -46,8 +46,8 @@ BMP open_img(const char* path){
 
 
     img.data = (RGB**)calloc( ((img.info.height*3-3)&(-4)), sizeof(RGB*));
-    img.data = (RGB**)malloc(sizeof(RGB*)*((img.info.height*3-3)&(-4)));
-    for (int i = 0; i < sizeof(img.info.height);  i++){
+    //img.data = (RGB**)malloc(sizeof(RGB*)*((img.info.height*3-3)&(-4)));
+    for (int i = 0; i < sizeof(img.data);  i++){
         img.data[i] = (RGB*)malloc(sizeof(RGB)*(img.info.width));
         fread(&img.data[i], 1, sizeof(img.data)*img.info.width, f);
     }
