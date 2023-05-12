@@ -14,9 +14,9 @@ void save_img (const char* path, BMP img ){
         fwrite(&img.file_header, 1, sizeof(img.file_header), f);
         fwrite(&img.info, 1, sizeof(img.info), f);
         //img.info.image_size = img.info.height*img.info.width*3;
-
+        unsigned int w3 = (3*img.info.width+3)&(-4);
         for (int i = 0; i <img.info.height ;  i++){
-            fwrite(&img.data[i], 1, sizeof(RGB)*img.info.width+img.info.width%4, f);
+            fwrite(&img.data[i], 1, w3, f);
         }
 
         printf("Работает!\n");
@@ -24,7 +24,7 @@ void save_img (const char* path, BMP img ){
 
     }
     fclose(f);
-    printf("%d   %d\n", img.info.width, img.info.width&(4));
+
 
 }
 
@@ -47,20 +47,23 @@ BMP open_img(const char* path){
     fread(&img.info, 1, sizeof(img.info), f);
     printf("%u\n", img.info.image_size);
 
+    unsigned int h = img.info.height;
+    unsigned int w = img.info.width;
+    unsigned int w3 = (3*w+3)&(-4);
+    printf("%d\n", w3);
+    img.data = (RGB**)calloc(1, img.info.height* sizeof(RGB*));
 
-    img.data = (RGB**)malloc(img.info.height* sizeof(RGB*));
-
-    for (int i = img.info.height-1; i >= 0 ;  i--){
-        img.data[i] = (RGB*)malloc(sizeof(RGB)*img.info.width+img.info.width%4);
-        fread(&img.data[i], 1, sizeof(RGB)*img.info.width, f);
+    for (int i = 0; i < h  ;  i++){
+        img.data[i] = (RGB*)calloc(1, w3);
+        fread(&img.data[i], 1, 3*w, f);
     }
 
 
     fclose(f);
-    printf("*%u\n", (3*img.info.width+img.info.width%4)*(img.info.height));
+    printf("*%u\n", w3*(img.info.height));
     return img;
 
-    }
+}
 
 
 
