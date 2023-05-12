@@ -5,9 +5,10 @@
 #ifndef CW_2_STRUCTURES_H
 #define CW_2_STRUCTURES_H
 
+;
 #pragma pack(push, 1)
 typedef struct {
-    unsigned short type[2];
+    unsigned char type[2];
     unsigned int size;
     unsigned short reserved1 ;
     unsigned short reserved2 ;
@@ -22,16 +23,16 @@ typedef struct {
     unsigned short bit_count;
     unsigned int compression;
     unsigned int image_size;
-    unsigned int Xpels_per_meter;
-    unsigned int Ypels_per_meter;
+    int Xpels_per_meter;
+    int Ypels_per_meter;
     unsigned int colors_used;
     unsigned int colors_important;
 } BMPInfo;
 
 typedef struct {
-    unsigned char red;
-    unsigned char green;
     unsigned char blue;
+    unsigned char green;
+    unsigned char red;
 
 } RGB;
 

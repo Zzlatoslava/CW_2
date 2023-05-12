@@ -6,7 +6,7 @@
 
 int main(){
 
-    BMP img = open_img("./Cw_2.bmp");
+    BMP img = open_img("./1.bmp");
     //color_inversion(&img, 100, 100, 750, 300);
     save_img("./new_img.bmp", img);
     int choice = 0;
