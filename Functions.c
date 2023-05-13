@@ -88,12 +88,14 @@ Image* open_img(const char* path){
 
 
 
-void color_inversion(Image *img, int coord_x1, int coord_y1, int coord_x2, int coord_y2){
-    for (int y = coord_y1; y < coord_y2; y++){
-        for (int x = coord_x1; x< coord_x2; x++){
-            img->pixels[h*w*3].red = 255 - img->pixels[h*w*3].red;
-            img->pixels[h*w*3].green = 255 - img->pixels[h*w*3].green;
-            img->pixels[h*w*3].blue = 255 - img->pixels[h*w*3].blue;
+void color_inversion(Image *img, int x1, int y1, int x2, int y2){
+    int h = img->h;
+    int w = img->w;
+    for (int y = y2; y <y1; y++){
+        for (int x = x1; x<x2; x++){
+            img->pixels[w*(y-1)+x-1].red = 255 - img->pixels[w*(y-1)+x-1].red;
+            img->pixels[w*(y-1)+x-1].green = 255 - img->pixels[w*(y-1)+x-1].green;
+            img->pixels[w*(y-1)+x-1].blue = 255 - img->pixels[w*(y-1)+x-1].blue;
 
         }
     }
@@ -101,16 +103,17 @@ void color_inversion(Image *img, int coord_x1, int coord_y1, int coord_x2, int c
 
 }
 
-/*void black_white(BMP * img,int coord_x1, int coord_y1, int coord_x2, int coord_y2 ) {
+void black_white(Image * img,int x1, int y1, int x2, int y2 ) {
     unsigned int b_w = 0;
-    for (int i = coord_y1; i < coord_y2; i++) {
-        for (int j = coord_x1; j < coord_x2; j++) {
+    int w = img->w;
+    for (int y = y2; y < y1; y++) {
+        for (int x = x1; x < x2; x++) {
 
-            b_w = (img->data[i][j].red + img->data[i][j].green + img->data[i][j].blue) / 3;
+            b_w = (img->pixels[w*(y-1)+x-1].red + img->pixels[w*(y-1)+x-1].green + img->pixels[w*(y-1)+x-1].blue) / 3;
 
-            img->data[i][j].red = b_w;
-            img->data[i][j].green = b_w;
-            img->data[i][j].blue = b_w;
+            img->pixels[w*(y-1)+x-1].red = b_w;
+            img->pixels[w*(y-1)+x-1].green = b_w;
+            img->pixels[w*(y-1)+x-1].blue = b_w;
         }
     }
-}*/
+}

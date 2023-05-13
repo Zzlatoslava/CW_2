@@ -15,6 +15,6 @@
 void save_img (const char* filename, Image* image);
 Image* open_img (const char* path);
 void color_inversion(Image *img, int coord_x1, int coord_y1, int coord_x2, int coord_y2);
-//void black_white(BMP * img,int coord_x1, int coord_y1, int coord_x2, int coord_y2 );*/
+void black_white(Image * img,int x1, int y1, int x2, int y2 );
 
 #endif //CW_2_FUNCTIONS_H
