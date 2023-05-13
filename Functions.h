@@ -9,11 +9,12 @@
 #include "Structures.h"
 #include <stdint.h>
 #include <math.h>
+#include <string.h>
 
 
-void save_img (const char* path, BMP img );
-BMP open_img (const char* path);
-/*void color_inversion(BMP *img, int coord_x1, int coord_y1, int coord_x2, int coord_y2);
-void black_white(BMP * img,int coord_x1, int coord_y1, int coord_x2, int coord_y2 );*/
+void save_img (const char* filename, Image* image);
+Image* open_img (const char* path);
+void color_inversion(Image *img, int coord_x1, int coord_y1, int coord_x2, int coord_y2);
+//void black_white(BMP * img,int coord_x1, int coord_y1, int coord_x2, int coord_y2 );*/
 
 #endif //CW_2_FUNCTIONS_H

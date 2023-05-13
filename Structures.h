@@ -37,10 +37,18 @@ typedef struct {
 } RGB;
 
 typedef struct {
-    BMPFHeader file_header;
-    BMPInfo info;
-    RGB** data;
+    BMPFHeader* file_header;
+    BMPInfo *info;
+    RGB* data;
 }BMP;
+
+typedef struct {
+    BMPFHeader* header ;
+    BMPInfo* info ;
+    RGB* pixels;
+    unsigned int w ;
+    unsigned int h;
+}Image;
 #pragma pack(pop)
 
 #endif //CW_2_STRUCTURES_H
