@@ -4,6 +4,7 @@
 
 #include "Functions.h"
 
+
 void save_img (const char* filename, Image* image){
     
     uint8_t *buffer;
@@ -89,8 +90,7 @@ Image* open_img(const char* path){
 
 
 void color_inversion(Image *img, int x1, int y1, int x2, int y2){
-    int h = img->h;
-    int w = img->w;
+    unsigned int w = img->w;
     for (int y = y2; y <y1; y++){
         for (int x = x1; x<x2; x++){
             img->pixels[w*(y-1)+x-1].red = 255 - img->pixels[w*(y-1)+x-1].red;
@@ -105,7 +105,7 @@ void color_inversion(Image *img, int x1, int y1, int x2, int y2){
 
 void black_white(Image * img,int x1, int y1, int x2, int y2 ) {
     unsigned int b_w = 0;
-    int w = img->w;
+    unsigned int w = img->w;
     for (int y = y2; y < y1; y++) {
         for (int x = x1; x < x2; x++) {
 
@@ -116,4 +116,56 @@ void black_white(Image * img,int x1, int y1, int x2, int y2 ) {
             img->pixels[w*(y-1)+x-1].blue = b_w;
         }
     }
+}
+
+
+void draw_line(Image * img, int x1, int y1, int x2, int y2, RGB color, int thickness ){
+    unsigned int width = img->w;
+    unsigned int height = img->h;
+    float  dx =(float)(x2 - x1);
+    float dy = (float)(y2 - y1);
+    float norm = sqrt(dx*dx + dy*dy);
+    dx /= norm;
+    dy /= norm;
+
+    float d = 0;
+    int x = x1, y = y1;
+    while ((x2 - x)*(x2 - x) + (y2 - y)*(y2 - y) > 1) {
+        for (int oy = -thickness/2; oy <= thickness/2; oy++) {
+            for (int ox = -thickness/2; ox <= thickness/2; ox++) {
+                if (x+ox >= 0 && x+ox < width && y+oy >= 0 && y+oy < height) {
+                    img->pixels[(y+oy)*width + (x+ox)] = color;
+                }
+            }
+        }
+        d += 1;
+        if (d >= norm) break;
+        x = x1 + (int)(dx*d);
+        y = y1 + (int)(dy*d);
+    }
+
+}
+
+void resize_image(Image *image, int new_width, int new_height, RGB background, int pos_x, int pos_y) {
+    unsigned int width = image->w;
+    unsigned int height = image->h;
+    RGB *new_image = (RGB*)malloc(sizeof(RGB)*new_width*new_height);
+    for (int y = 0; y < new_height; y++) {
+        for (int x = 0; x < new_width; x++) {
+            int old_x = (int)((x - pos_x) * width/ new_width + pos_x);
+            int old_y = (int)((y - pos_y) * height / new_height + pos_y);
+            if ( old_x > width  || old_y > height) {
+                new_image[y * new_width + x] = background;
+            } else {
+                new_image[y * new_width + x] = image->pixels[old_y * (width) + old_x];
+            }
+        }
+    }
+
+    image->pixels = new_image;
+    image->w = new_width;
+    image->h = new_height;
+    image->info->image_size = (3*new_width+new_width%4)* new_height;
+    image->info->width = new_width;
+    image->info->height = new_height;
 }
