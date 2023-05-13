@@ -14,8 +14,11 @@ void save_img (const char* path, BMP img ){
         fwrite(&img.file_header, 1, sizeof(img.file_header), f);
         fwrite(&img.info, 1, sizeof(img.info), f);
         //img.info.image_size = img.info.height*img.info.width*3;
-        unsigned int w3 = (3*img.info.width+3)&(-4);
-        for (int i = 0; i <img.info.height ;  i++){
+        unsigned int h = img.info.height;
+        unsigned int w = img.info.width;
+        unsigned int h3 = h+h%4;
+        unsigned int w3 = 3*w+w%4;
+        for (int i = 0; i <h ;  i++){
             fwrite(&img.data[i], 1, w3, f);
         }
 
@@ -49,13 +52,16 @@ BMP open_img(const char* path){
 
     unsigned int h = img.info.height;
     unsigned int w = img.info.width;
-    unsigned int w3 = (3*w+3)&(-4);
+    unsigned int w3 = 3*w+w%4;
+    unsigned int h3 = h+h%4;
     printf("%d\n", w3);
-    img.data = (RGB**)calloc(1, img.info.height* sizeof(RGB*));
+    img.data = (RGB**)calloc(1, h* sizeof(RGB*));
 
     for (int i = 0; i < h  ;  i++){
-        img.data[i] = (RGB*)calloc(1, w3);
+        img.data[i] = (RGB*)calloc(1,w3);
         fread(&img.data[i], 1, 3*w, f);
+        //unsigned char tmp ;
+        //printf("%d: %d, %d, %d\n", i, img.data[i]->red, img.data[i]->green, img.data[i]->blue);
     }
 
 
