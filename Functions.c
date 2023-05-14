@@ -6,7 +6,7 @@
 
 
 void save_img (const char* filename, Image* image){
-    
+
     uint8_t *buffer;
 
     uint32_t row_size = image->w * sizeof (RGB);
@@ -93,9 +93,9 @@ void color_inversion(Image *img, int x1, int y1, int x2, int y2){
     unsigned int w = img->w;
     for (int y = y2; y <y1; y++){
         for (int x = x1; x<x2; x++){
-            img->pixels[w*(y-1)+x-1].red = 255 - img->pixels[w*(y-1)+x-1].red;
-            img->pixels[w*(y-1)+x-1].green = 255 - img->pixels[w*(y-1)+x-1].green;
-            img->pixels[w*(y-1)+x-1].blue = 255 - img->pixels[w*(y-1)+x-1].blue;
+            img->pixels[w*y+x].red = 255 - img->pixels[w*y+x].red;
+            img->pixels[w*y+x].green = 255 - img->pixels[w*y+x].green;
+            img->pixels[w*y+x].blue = 255 - img->pixels[w*y+x].blue;
 
         }
     }
@@ -109,11 +109,11 @@ void black_white(Image * img,int x1, int y1, int x2, int y2 ) {
     for (int y = y2; y < y1; y++) {
         for (int x = x1; x < x2; x++) {
 
-            b_w = (img->pixels[w*(y-1)+x-1].red + img->pixels[w*(y-1)+x-1].green + img->pixels[w*(y-1)+x-1].blue) / 3;
+            b_w = (img->pixels[w*y+x].red + img->pixels[w*y+x].green + img->pixels[w*y+x].blue) / 3;
 
-            img->pixels[w*(y-1)+x-1].red = b_w;
-            img->pixels[w*(y-1)+x-1].green = b_w;
-            img->pixels[w*(y-1)+x-1].blue = b_w;
+            img->pixels[w*y+x].red = b_w;
+            img->pixels[w*y+x].green = b_w;
+            img->pixels[w*y+x].blue = b_w;
         }
     }
 }
@@ -146,21 +146,74 @@ void draw_line(Image * img, int x1, int y1, int x2, int y2, RGB color, int thick
 
 }
 
-void resize_image(Image *image, int new_width, int new_height, RGB background, int pos_x, int pos_y) {
-    unsigned int width = image->w;
-    unsigned int height = image->h;
+void resize_image(Image *image, int new_width, int new_height, RGB background, int anchor_point) {
+
     RGB *new_image = (RGB*)malloc(sizeof(RGB)*new_width*new_height);
-    for (int y = 0; y < new_height; y++) {
-        for (int x = 0; x < new_width; x++) {
-            int old_x = (int)((x - pos_x) * width/ new_width + pos_x);
-            int old_y = (int)((y - pos_y) * height / new_height + pos_y);
-            if ( old_x > width  || old_y > height) {
-                new_image[y * new_width + x] = background;
-            } else {
-                new_image[y * new_width + x] = image->pixels[old_y * (width) + old_x];
-            }
-        }
+    RGB* old_image = image->pixels;
+    unsigned int old_width = image->w;
+    unsigned int old_height = image->h;
+
+
+    int x1, x2, y1, y2;
+// определить точку относительно которой производится масштабирование
+    switch(anchor_point) {
+        case 1:
+             x1 = 0;
+             x2 = new_width - 1;
+             y1 = old_height -1;
+             y2 = old_height - new_height;
+            break;
+        case 2:
+            x1 = old_width-new_width;
+            x2 = old_width-1;
+            y1 = old_height -1;
+            y2 = old_height - new_height;
+            break;
+        case 3:
+            x1 = 0;
+            x2 = new_width - 1;
+            y1 = new_height -1;
+            y2 = 0;
+            break;
+        case 4:
+            x1 = old_width- new_width;
+            x2 = old_width - 1;
+            y1 = new_height -1;
+            y2 = 0;
+            break;
+        case 0:
+// по умолчанию центр
+            x1 = 0;
+            x2 = new_width - 1;
+            y1 = old_height - (int)((old_height - new_height)/2)-1;
+            y2 = (int)((old_height - new_height)/2);
+            break;
+        default:
+            printf("Error!");
     }
+
+    for( int y = 0 ; y < new_height; y++) {
+        for (int x = 0; x < new_width; x++) {
+                if(x1!=x2 && y1!= y2) {
+                    new_image[new_width * y + x] = old_image[old_width * y1 + x1];
+                    y1--;
+                    x1++;
+                }
+                   else{
+                       new_image[new_width * y + x] = background;
+                    }
+
+                  }
+
+        }
+
+
+
+
+
+
+// нарисовать старое изображение на новом с учетом масштабирования
+
 
     image->pixels = new_image;
     image->w = new_width;
