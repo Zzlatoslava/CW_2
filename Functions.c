@@ -192,20 +192,25 @@ void resize_image(Image *image, int new_width, int new_height, RGB background, i
             printf("Error!");
     }
 
-    for( int y = 0 ; y < new_height; y++) {
-        for (int x = 0; x < new_width; x++) {
+    for( int y = 0, i = y2 ; y < y1, i< y1; y++, i++) {
+        for (int x = 0, j = x1; x < x2, j < x2; x++, j++) {
                 if(x1!=x2 && y1!= y2) {
-                    new_image[new_width * y + x] = old_image[old_width * y1 + x1];
-                    y1--;
-                    x1++;
+                    new_image[new_width * y + x] = old_image[old_width * i + j];
+
                 }
-                   else{
+                   /*else{
                        new_image[new_width * y + x] = background;
-                    }
+                    }*/
 
                   }
 
         }
+    for (int y = y1; y < new_width; y++){
+        for (int x = x2; x< new_height; x++){
+            new_image[new_width * y + x] = background;
+        }
+    }
+
 
 
 
