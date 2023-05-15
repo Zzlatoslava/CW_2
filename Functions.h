@@ -12,7 +12,7 @@
 #include <string.h>
 
 
-
+RGB choice_color(int choice);
 void save_img (const char* filename, Image* image);
 Image* open_img (const char* path);
 void color_inversion(Image *img, int coord_x1, int coord_y1, int coord_x2, int coord_y2);

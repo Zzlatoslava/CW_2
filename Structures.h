@@ -29,18 +29,14 @@ typedef struct {
     unsigned int colors_important;
 } BMPInfo;
 
-typedef struct {
+typedef struct RGB{
     unsigned char blue;
     unsigned char green;
     unsigned char red;
 
 } RGB;
 
-typedef struct {
-    BMPFHeader* file_header;
-    BMPInfo *info;
-    RGB* data;
-}BMP;
+
 
 typedef struct {
     BMPFHeader* header ;

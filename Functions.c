@@ -4,6 +4,23 @@
 
 #include "Functions.h"
 
+RGB choice_color(int choice){
+
+
+    if (choice == 1) {
+         RGB color = {50, 68, 247};//red
+         return color;
+    }
+    else if(choice == 2) {
+        RGB color = {182, 95, 255};//pink
+        return color;
+    }
+    else if (choice == 3){
+            RGB color = {184, 48, 132};//purple
+        return color;}
+
+}
+
 
 void save_img (const char* filename, Image* image){
 
@@ -152,10 +169,11 @@ void resize_image(Image *image, int new_width, int new_height, RGB background, i
     RGB* old_image = image->pixels;
     unsigned int old_width = image->w;
     unsigned int old_height = image->h;
-
+    RGB b_ground = {0,0,0};
+    b_ground = background;
 
     int x1, x2, y1, y2;
-// определить точку относительно которой производится масштабирование
+
     switch(anchor_point) {
         case 1:
              x1 = 0;
@@ -189,27 +207,28 @@ void resize_image(Image *image, int new_width, int new_height, RGB background, i
             y2 = (int)((old_height - new_height)/2);
             break;
         default:
-            printf("Error!");
+            printf("Error!!");
+    }
+    for (int i = 0; i < new_height*new_width; i++){
+
+            new_image[i]= b_ground;
+
+
     }
 
-    for( int y = 0, i = y2 ; y < y1, i< y1; y++, i++) {
-        for (int x = 0, j = x1; x < x2, j < x2; x++, j++) {
-                if(x1!=x2 && y1!= y2) {
+    for( int y = 0, i = y2 ; y < new_height, i<= y1; y++, i++) {
+
+        for (int x = 0, j = x1; x < new_width, j <= x2; x++, j++) {
+
                     new_image[new_width * y + x] = old_image[old_width * i + j];
 
-                }
-                   /*else{
-                       new_image[new_width * y + x] = background;
-                    }*/
+
 
                   }
 
+
         }
-    for (int y = y1; y < new_width; y++){
-        for (int x = x2; x< new_height; x++){
-            new_image[new_width * y + x] = background;
-        }
-    }
+
 
 
 
