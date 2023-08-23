@@ -1,7 +1,3 @@
-//
-// Created by Златослава on 02.05.2023.
-//
-
 #include "Functions.h"
 
 RGB choice_color(int choice){
@@ -51,6 +47,7 @@ void save_img (const char* filename, Image* image){
     FILE * file = fopen(filename, "wb");
     fwrite(buffer, allsize, 1, file);
     fclose(file);
+    free(buffer);
 
 }
 
@@ -74,9 +71,18 @@ Image* open_img(const char* path){
 
     BMPFHeader* header = malloc(sizeof(BMPFHeader));
     memcpy(header, buffer, sizeof(BMPFHeader));
+    if(header->type[0] != 'B' && header->type[0] != 'M'){
+        printf("Вы используете не bmp-файл.\n");
+        exit(1);
+    }
+
 
     BMPInfo* info = malloc(sizeof (BMPInfo));
     memcpy(info, buffer + sizeof(BMPFHeader), sizeof(BMPInfo));
+    if (info->header_size != 40){
+        printf("Неподдерживаемая версия bmp-файла. Используйте только 3 версию.\n");
+        exit(1);
+    }
 
     uint8_t * image = malloc(sizeof(RGB) * info->width * info->height);
 
@@ -88,21 +94,15 @@ Image* open_img(const char* path){
         memcpy(image + y*row_size, pixel_buffer+ y*row_size_row, row_size);
     }
 
-
     Image* picture = malloc(sizeof(Image));
     picture->header = header;
     picture->info = info;
     picture->pixels = (RGB*) image;
     picture->w = info->width;
     picture->h = info->height;
-    //printf("!!!!!!!!!!!\n");
     return picture;
 
 }
-
-
-
-
 
 
 
@@ -121,7 +121,7 @@ void color_inversion(Image *img, int x1, int y1, int x2, int y2){
 }
 
 void black_white(Image * img,int x1, int y1, int x2, int y2 ) {
-    unsigned int b_w = 0;
+    unsigned int b_w;
     unsigned int w = img->w;
     for (int y = y2; y < y1; y++) {
         for (int x = x1; x < x2; x++) {
@@ -133,6 +133,78 @@ void black_white(Image * img,int x1, int y1, int x2, int y2 ) {
             img->pixels[w*y+x].blue = b_w;
         }
     }
+}
+
+
+
+void resize_image(Image *image, int new_width, int new_height, int anchor_point) {
+
+    RGB *new_image = (RGB*)malloc((3*new_width+new_width%4)* new_height);
+    RGB* old_image = image->pixels;
+    unsigned int old_width = image->w;
+    unsigned int old_height = image->h;
+    RGB color = {255, 0, 255};
+    if (new_width > old_width || new_height > old_height){
+        for( int y = 0 ; y < new_height; y++){
+            for (int x = 0; x < new_width; x++){
+                new_image[new_width*y+x] = color;
+            }
+        }
+    }
+    else {
+
+        unsigned int x1, x2, y1, y2;
+
+        switch (anchor_point) {
+            case 1:
+                x1 = 0;
+                x2 = new_width - 1;
+                y1 = old_height - 1;
+                y2 = old_height - new_height;
+                break;
+            case 2:
+                x1 = old_width - new_width;
+                x2 = old_width - 1;
+                y1 = old_height - 1;
+                y2 = old_height - new_height;
+                break;
+            case 3:
+                x1 = 0;
+                x2 = new_width - 1;
+                y1 = new_height - 1;
+                y2 = 0;
+                break;
+            case 4:
+                x1 = old_width - new_width;
+                x2 = old_width - 1;
+                y1 = new_height - 1;
+                y2 = 0;
+                break;
+            case 0:
+                x1 = ((old_width - new_width) / 2) - 1;
+                x2 = x1 + new_width;
+                y2 = ((old_height - new_height) / 2);
+                y1 = old_height - y2;
+
+                break;
+            default:
+                printf("Ошибка высчитывания координат. Повторите попытку\n");
+        }
+        for (unsigned int y = 0, i = y2; y < new_height, i <= y1; y++, i++) {
+
+            for (unsigned int x = 0, j = x1; x < new_width, j <= x2; x++, j++) {
+
+                new_image[new_width * y + x] = old_image[old_width * i + j];
+            }
+        }
+    }
+    image->pixels = new_image;
+    image->w = new_width;
+    image->h = new_height;
+    image->info->image_size = (3*new_width+new_width%4)* new_height;
+    image->info->width = new_width;
+    image->info->height = new_height;
+    //free(new_image);
 }
 
 
@@ -163,86 +235,3 @@ void draw_line(Image * img, int x1, int y1, int x2, int y2, RGB color, int thick
 
 }
 
-void resize_image(Image *image, int new_width, int new_height, RGB background, int anchor_point) {
-
-    RGB *new_image = (RGB*)malloc(sizeof(RGB)*new_width*new_height);
-    RGB* old_image = image->pixels;
-    unsigned int old_width = image->w;
-    unsigned int old_height = image->h;
-    RGB b_ground = {0,0,0};
-    b_ground = background;
-
-    int x1, x2, y1, y2;
-
-    switch(anchor_point) {
-        case 1:
-             x1 = 0;
-             x2 = new_width - 1;
-             y1 = old_height -1;
-             y2 = old_height - new_height;
-            break;
-        case 2:
-            x1 = old_width-new_width;
-            x2 = old_width-1;
-            y1 = old_height -1;
-            y2 = old_height - new_height;
-            break;
-        case 3:
-            x1 = 0;
-            x2 = new_width - 1;
-            y1 = new_height -1;
-            y2 = 0;
-            break;
-        case 4:
-            x1 = old_width- new_width;
-            x2 = old_width - 1;
-            y1 = new_height -1;
-            y2 = 0;
-            break;
-        case 0:
-// по умолчанию центр
-            x1 = 0;
-            x2 = new_width - 1;
-            y1 = old_height - (int)((old_height - new_height)/2)-1;
-            y2 = (int)((old_height - new_height)/2);
-            break;
-        default:
-            printf("Error!!");
-    }
-    for (int i = 0; i < new_height*new_width; i++){
-
-            new_image[i]= b_ground;
-
-
-    }
-
-    for( int y = 0, i = y2 ; y < new_height, i<= y1; y++, i++) {
-
-        for (int x = 0, j = x1; x < new_width, j <= x2; x++, j++) {
-
-                    new_image[new_width * y + x] = old_image[old_width * i + j];
-
-
-
-                  }
-
-
-        }
-
-
-
-
-
-
-
-
-// нарисовать старое изображение на новом с учетом масштабирования
-
-
-    image->pixels = new_image;
-    image->w = new_width;
-    image->h = new_height;
-    image->info->image_size = (3*new_width+new_width%4)* new_height;
-    image->info->width = new_width;
-    image->info->height = new_height;
-}
