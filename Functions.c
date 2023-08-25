@@ -139,69 +139,65 @@ void black_white(Image * img,int x1, int y1, int x2, int y2 ) {
 
 void resize_image(Image *image, int new_width, int new_height, int anchor_point) {
 
-    RGB *new_image = (RGB*)malloc((3*new_width+new_width%4)* new_height);
+    RGB *new_image = (RGB*)malloc(3*(new_width+new_width%4)* new_height);
     RGB* old_image = image->pixels;
     unsigned int old_width = image->w;
     unsigned int old_height = image->h;
-    RGB color = {255, 0, 255};
+    RGB color = {255, 125, 255};
     if (new_width > old_width || new_height > old_height){
         for( int y = 0 ; y < new_height; y++){
             for (int x = 0; x < new_width; x++){
                 new_image[new_width*y+x] = color;
             }
         }
-    }
-    else {
-
         unsigned int x1, x2, y1, y2;
 
         switch (anchor_point) {
             case 1:
                 x1 = 0;
-                x2 = new_width - 1;
-                y1 = old_height - 1;
-                y2 = old_height - new_height;
+                x2 = old_width - 1;
+                y1 = 0;
+                y2 = old_height - 1;
                 break;
             case 2:
-                x1 = old_width - new_width;
-                x2 = old_width - 1;
-                y1 = old_height - 1;
-                y2 = old_height - new_height;
+                x1 = abs(new_width - old_width);
+                x2 = new_width - 1;
+                y1 = abs(new_height - old_height);
+                y2 = new_height - 1;
                 break;
             case 3:
                 x1 = 0;
-                x2 = new_width - 1;
-                y1 = new_height - 1;
-                y2 = 0;
+                x2 = old_width - 1;
+                y1 = abs(new_height - old_height);
+                y2 = new_height - 1;
                 break;
             case 4:
-                x1 = old_width - new_width;
-                x2 = old_width - 1;
-                y1 = new_height - 1;
-                y2 = 0;
+                x1 = abs(new_width - old_width);
+                x2 = new_width - 1;
+                y1 = 0;
+                y2 = old_height - 1;
                 break;
             case 0:
-                x1 = ((old_width - new_width) / 2) - 1;
-                x2 = x1 + new_width;
-                y2 = ((old_height - new_height) / 2);
-                y1 = old_height - y2;
+                x1 = (abs(new_width - old_width) / 2) - 1;
+                x2 = x1 + old_width;
+                y1 = (abs(new_height - old_height) / 2);
+                y2 = y1 + old_height;
 
                 break;
             default:
                 printf("Ошибка высчитывания координат. Повторите попытку\n");
         }
-        for (unsigned int y = 0, i = y2; y < new_height, i <= y1; y++, i++) {
-
-            for (unsigned int x = 0, j = x1; x < new_width, j <= x2; x++, j++) {
-
+        for (unsigned int y = y1 ,  i = 0; y < y2, i < old_height; y++, i++) {
+            for (unsigned int x = x1, j = 0; x < x2, j < old_width; x++, j++) {
                 new_image[new_width * y + x] = old_image[old_width * i + j];
             }
         }
     }
+
     image->pixels = new_image;
     image->w = new_width;
     image->h = new_height;
-    image->info->image_size = (3*new_width+new_width%4)* new_height;
+    image->info->image_size = 3*(new_width+new_width%4)* new_height;
     image->info->width = new_width;
     image->info->height = new_height;
     //free(new_image);
