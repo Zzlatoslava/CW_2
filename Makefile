@@ -1,5 +1,5 @@
 all: main.o Functions.o
-	gcc  main.o Functions.o -o main -lm
+	gcc  main.o Functions.o -o pic -lm
 main.o: main.c Structures.h Functions.h
 	gcc -c  main.c -lm
 Functions.o: Functions.c Structures.h

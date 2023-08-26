@@ -159,7 +159,6 @@ void resize_image(Image *image, int new_width, int new_height, int anchor_point,
     RGB* old_image = image->pixels;
     unsigned int old_width = image->w;
     unsigned int old_height = image->h;
-    if (new_width > old_width || new_height > old_height){
         for( int y = 0 ; y < new_height; y++){
             for (int x = 0; x < new_width; x++){
                 new_image[new_width*y+x] = color;
@@ -207,7 +206,7 @@ void resize_image(Image *image, int new_width, int new_height, int anchor_point,
                 new_image[new_width * y + x] = old_image[old_width * i + j];
             }
         }
-    }
+
 
     image->pixels = new_image;
     image->w = new_width;
