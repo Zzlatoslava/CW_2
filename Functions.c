@@ -14,6 +14,12 @@ RGB choice_color(int choice){
     else if (choice == 3){
             RGB color = {184, 48, 132};//purple
         return color;}
+    else {
+        RGB color = {0,0,0};
+        return color;
+    }
+
+
 
 }
 
@@ -107,6 +113,11 @@ Image* open_img(const char* path){
 
 
 void color_inversion(Image *img, int x1, int y1, int x2, int y2){
+    if (img->info->width < x1 || img->info->width < x2 || img->info->height < y1 || img->info->height < y2){
+        printf ("Координаты больше размера изображения, попробуйте изменить параметры\n");
+        free(img);
+        exit(1);
+    }
     unsigned int w = img->w;
     for (int y = y2; y <y1; y++){
         for (int x = x1; x<x2; x++){
@@ -121,6 +132,11 @@ void color_inversion(Image *img, int x1, int y1, int x2, int y2){
 }
 
 void black_white(Image * img,int x1, int y1, int x2, int y2 ) {
+    if (img->info->width < x1 || img->info->width < x2 || img->info->height < y1 || img->info->height < y2){
+        printf ("Координаты больше размера изображения, попробуйте изменить параметры\n");
+        free(img);
+        exit(1);
+    }
     unsigned int b_w;
     unsigned int w = img->w;
     for (int y = y2; y < y1; y++) {
@@ -137,13 +153,12 @@ void black_white(Image * img,int x1, int y1, int x2, int y2 ) {
 
 
 
-void resize_image(Image *image, int new_width, int new_height, int anchor_point) {
+void resize_image(Image *image, int new_width, int new_height, int anchor_point, RGB color) {
 
     RGB *new_image = (RGB*)malloc(3*(new_width+new_width%4)* new_height);
     RGB* old_image = image->pixels;
     unsigned int old_width = image->w;
     unsigned int old_height = image->h;
-    RGB color = {255, 125, 255};
     if (new_width > old_width || new_height > old_height){
         for( int y = 0 ; y < new_height; y++){
             for (int x = 0; x < new_width; x++){
@@ -205,6 +220,11 @@ void resize_image(Image *image, int new_width, int new_height, int anchor_point)
 
 
 void draw_line(Image * img, int x1, int y1, int x2, int y2, RGB color, int thickness ){
+    if (img->info->width < x1 || img->info->width < x2 || img->info->height < y1 || img->info->height < y2){
+        printf ("Координаты больше размера изображения, попробуйте изменить параметры\n");
+        free(img);
+        exit(1);
+    }
     unsigned int width = img->w;
     unsigned int height = img->h;
     float  dx =(float)(x2 - x1);
