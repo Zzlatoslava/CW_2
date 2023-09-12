@@ -1,6 +1,3 @@
-//
-// Created by Златослава on 02.05.2023.
-//
 
 #ifndef CW_2_STRUCTURES_H
 #define CW_2_STRUCTURES_H

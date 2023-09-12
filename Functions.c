@@ -4,15 +4,15 @@ RGB choice_color(int choice){
 
 
     if (choice == 1) {
-         RGB color = {50, 68, 247};//red
-         return color;
+        RGB color = {50, 68, 247};//red
+        return color;
     }
     else if(choice == 2) {
         RGB color = {182, 95, 255};//pink
         return color;
     }
     else if (choice == 3){
-            RGB color = {184, 48, 132};//purple
+        RGB color = {184, 48, 132};//purple
         return color;}
     else {
         RGB color = {0,0,0};
@@ -51,6 +51,10 @@ void save_img (const char* filename, Image* image){
     }
 
     FILE * file = fopen(filename, "wb");
+    if (file == NULL ){
+        printf("Ошибка в названии файла для записи. Повторите попытку\n");
+        exit(1);
+    }
     fwrite(buffer, allsize, 1, file);
     fclose(file);
     free(buffer);
@@ -65,6 +69,10 @@ Image* open_img(const char* path){
     uint8_t *buffer;
 
     FILE * file = fopen(path, "rb");
+    if (file == NULL ){
+        printf("Ошибка в названии файла для считывания. Повторите попытку\n");
+        exit(1);
+    }
     fseek(file, 0, SEEK_END);
     size = ftell(file);
     rewind(file);
@@ -159,53 +167,46 @@ void resize_image(Image *image, int new_width, int new_height, int anchor_point,
     RGB* old_image = image->pixels;
     unsigned int old_width = image->w;
     unsigned int old_height = image->h;
-        for( int y = 0 ; y < new_height; y++){
-            for (int x = 0; x < new_width; x++){
-                new_image[new_width*y+x] = color;
+    for( int y = 0 ; y < new_height; y++){
+        for (int x = 0; x < new_width; x++){
+            new_image[new_width*y+x] = color;
+        }
+    }
+    int offsetX = 0;
+    int offsetY = 0;
+    if (anchor_point == 3) {
+        offsetX = 0;
+        offsetY = 0;
+    } else if (anchor_point == 4) {
+        offsetX = new_width - old_width;
+        offsetY = 0;
+    } else if (anchor_point == 1) {
+        offsetX = 0;
+        offsetY = new_height - old_height;
+    } else if (anchor_point == 2) {
+        offsetX = new_width - old_width;
+        offsetY = new_height - old_height;
+    } else if (anchor_point == 0 ){
+        offsetX = abs(new_width - old_width)/2;
+        offsetY = abs(new_height - old_height)/2;
+    }
+    else{
+        printf("Неверно выбрана точка, воспользуйтесь справкой(-h /--help)\n");
+        free(image);
+        exit(1);
+    }
+
+    // Копируем пиксели исходного изображения в новое изображение
+    for (int y = 0; y < old_height; y++) {
+        for (int x = 0; x < old_width; x++) {
+            int newX = x + offsetX;
+            int newY = y + offsetY;
+            if (newX >= 0 && newX < new_width && newY >= 0 && newY < new_height) {
+                new_image[newY * new_width + newX] = old_image[y * old_width + x];
             }
         }
-        unsigned int x1, x2, y1, y2;
+    }
 
-        switch (anchor_point) {
-            case 1:
-                x1 = 0;
-                x2 = old_width - 1;
-                y1 = 0;
-                y2 = old_height - 1;
-                break;
-            case 2:
-                x1 = abs(new_width - old_width);
-                x2 = new_width - 1;
-                y1 = abs(new_height - old_height);
-                y2 = new_height - 1;
-                break;
-            case 3:
-                x1 = 0;
-                x2 = old_width - 1;
-                y1 = abs(new_height - old_height);
-                y2 = new_height - 1;
-                break;
-            case 4:
-                x1 = abs(new_width - old_width);
-                x2 = new_width - 1;
-                y1 = 0;
-                y2 = old_height - 1;
-                break;
-            case 0:
-                x1 = (abs(new_width - old_width) / 2) - 1;
-                x2 = x1 + old_width;
-                y1 = (abs(new_height - old_height) / 2);
-                y2 = y1 + old_height;
-
-                break;
-            default:
-                printf("Ошибка высчитывания координат. Повторите попытку\n");
-        }
-        for (unsigned int y = y1 ,  i = 0; y < y2, i < old_height; y++, i++) {
-            for (unsigned int x = x1, j = 0; x < x2, j < old_width; x++, j++) {
-                new_image[new_width * y + x] = old_image[old_width * i + j];
-            }
-        }
 
 
     image->pixels = new_image;
@@ -249,4 +250,3 @@ void draw_line(Image * img, int x1, int y1, int x2, int y2, RGB color, int thick
     }
 
 }
-

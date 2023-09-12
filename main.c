@@ -6,17 +6,16 @@
 
 int main(int argc, char *argv[]) {
     int num_func;
-    char *file_name;
+    char *file_name = NULL;
+    char *write = NULL;
     int x1 = -1, x2 = -1, y1 = -1, y2 = -1;
     RGB color = choice_color(4);
     int thick = -1;
     int point = -1;
-    char *write;
     int width = -1;
     int height = -1;
 
-
-   int c;
+    int c;
 
     while (1) {
         static struct option long_opt[] = { //указатель массив длинных опций
@@ -37,7 +36,7 @@ int main(int argc, char *argv[]) {
         };
         int optIdx;
 
-        if ((c = getopt_long(argc, argv, "ibrlh s::e::c:f:t:p:v:w:", long_opt, &optIdx)) == -1)
+        if ((c = getopt_long(argc, argv, "ibrlh s:e:c:f:t:p:v:w:", long_opt, &optIdx)) == -1)
             break;
         switch (c) {
             case 'h': {
@@ -45,17 +44,20 @@ int main(int argc, char *argv[]) {
                 printf("\nИнверсия цвета области задается:\n"
                        "Путь к изображению(img)\n"
                        "Координатами левого верхнего и правого нижнего углов( (x1, y1), (x2, y2) )\n"
+                       "Примечание: Координаты по умолчанию равны 0\n"
                        "-i/--invert -f img -s x1 y1 -e x2 y2\n");
 
                 printf("\nПреобразование области в Ч/Б задается:\n"
                        "Путь к изображению(img)\n"
                        "Координатами левого верхнего и правого нижнего углов( (x1, y1), (x2, y2) )\n"
+                       "Примечание: Координаты по умолчанию равны 0\n"
                        "-b/--black -f img -s x1 y1 -e x2 y2\n");
 
                 printf("\nРисование отрезка задается:\n"
                        "Путь к изображению(img)\n"
                        "Координатами начала (x1, y1)\n"
                        "Координатами конца (x2, y2)\n"
+                       "Примечание: Координаты по умолчанию равны 0\n"
                        "Цветом отрезка (color):\n"
                        "                Возможные цвета: red, pink, purple(по умолчанию - черный)\n"
                        "Толщиной (thick)"
@@ -78,7 +80,7 @@ int main(int argc, char *argv[]) {
                        "-r/--resize -f img -v width height  -p point -c color \n"
 
                 );
-                printf("Обязательно указывается файл для записи результата\n"
+                printf("Обязательно указывается файл для записи результата в формате bmp\n"
                        "-w/--write\n");
                 printf("-----------------------------------------------------------\n");
                 exit(1);
@@ -102,11 +104,8 @@ int main(int argc, char *argv[]) {
             case 's':
                 x1 = atoi(argv[optind - 1]);
                 y1 = atoi(argv[optind]);
-                if (x1 == -1 || y1 == -1){
-                    printf("Не хватает аргументов для выполнения функции. Воспользуйтесь справкой(-h /--help)\n");
-                    exit(1);
-                }
-                else if (x1 < 0 || y1 < 0) {
+
+                if (x1 < 0 || y1 < 0) {
                     printf("Координаты должны быть неотрицательными.\n");
                     exit(1);
                 }
@@ -114,11 +113,8 @@ int main(int argc, char *argv[]) {
             case 'e':
                 x2 = atoi(argv[optind - 1]);
                 y2 = atoi(argv[optind]);
-                if (x2 == -1 || y2 == -1){
-                    printf("Не хватает аргументов для выполнения функции. Воспользуйтесь справкой(-h /--help)\n");
-                    exit(1);
-                }
-                else if (x2 < 0 || y2 < 0) {
+                printf("x2:%d\ny2:%d\n", x2, y2);
+                if (x2 < 0 || y2 < 0) {
                     printf("Координаты должны быть неотрицательными.\n");
                     exit(1);
                 }
@@ -163,10 +159,12 @@ int main(int argc, char *argv[]) {
                 break;
 
             case 'w':
-                write = optarg;
+                if (optarg != NULL) {
+                    write = optarg;
 
-                if (write == NULL) {
+                } else {
                     printf("Неверное название файла.\n");
+
                     exit(1);
                 }
 
@@ -190,11 +188,14 @@ int main(int argc, char *argv[]) {
                 printf("Неверный параметр, воспользуйтесь справкой(-h /--help)\n");
                 exit(1);
         }
+
     }
+
     if (file_name == NULL) {
         printf("Отсутствует название файла для считывания. Воспользуйтесь справкой(-h /--help)\n");
         exit(1);
     }
+
     if (write == NULL) {
         printf("Отсутствует название файла для записи. Воспользуйтесь справкой(-h /--help)\n");
         exit(1);
@@ -203,16 +204,16 @@ int main(int argc, char *argv[]) {
 
     switch (num_func) {
         case 1:
-            if (x1 == -1 || x2 == -1 || y1 == -1 || y2 == -1) {
-                printf("Не хватает аргументов для выполнения функции. Воспользуйтесь справкой(-h /--help)\n");
+            if (x1 >= x2 || y1 <= y2   ) {
+                printf("Выбран не левый верхний или правый нижний угол. Воспользуйтесь справкой(-h /--help)\n");
                 free(img);
                 exit(1);
             }
             color_inversion(img, x1, y1, x2, y2);
             break;
         case 2:
-            if (x1 == -1 || x2 == -1 || y1 == -1 || y2 == -1) {
-                printf("Не хватает аргументов для выполнения функции. Воспользуйтесь справкой(-h /--help)\n");
+            if (x1 >= x2 || y1 <= y2   ) {
+                printf("Выбран не левый верхний или правый нижний угол. Воспользуйтесь справкой(-h /--help)\n");
                 free(img);
                 exit(1);
             }
@@ -227,8 +228,8 @@ int main(int argc, char *argv[]) {
             resize_image(img, width, height, point, color);
             break;
         case 4:
-            if (x1 == -1 || x2 == -1 || y1 == -1 || y2 == -1 || thick == -1) {
-                printf("Не хватает аргументов для выполнения функции. Воспользуйтесь справкой(-h /--help)\n");
+            if (x1 >= x2 || y1 <= y2   ) {
+                printf("Выбран не левый верхний или правый нижний угол. Воспользуйтесь справкой(-h /--help)\n");
                 free(img);
                 exit(1);
             }
