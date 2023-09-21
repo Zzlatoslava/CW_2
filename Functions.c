@@ -196,7 +196,6 @@ void resize_image(Image *image, int new_width, int new_height, int anchor_point,
         exit(1);
     }
 
-    // Копируем пиксели исходного изображения в новое изображение
     for (int y = 0; y < old_height; y++) {
         for (int x = 0; x < old_width; x++) {
             int newX = x + offsetX;
@@ -215,7 +214,6 @@ void resize_image(Image *image, int new_width, int new_height, int anchor_point,
     image->info->image_size = 3*(new_width+new_width%4)* new_height;
     image->info->width = new_width;
     image->info->height = new_height;
-    //free(new_image);
 }
 
 
